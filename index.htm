@@ -1,0 +1,275 @@
+<!DOCTYPE HTML>
+
+<html>
+
+<head>
+
+  <title>WeatherProgress</title>
+  <meta name="title" content="WeatherMan">
+  <link rel="shortcut icon" type="image/jpg" href="weather.png"/>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://botUser-2023.github.io/weatherapp/">
+  <meta property="og:title" content="WeatherMan">
+  <meta property="og:description" content="Know your area weather and alert your pals">
+  <meta property="og:image" content="https://botUser-2023.github.io/weatherapp/weather.png">
+  <meta name="viewport" content="width=device-width,initialscale=1,maximum-scale=1,user-scalable=no">
+  
+  <script src="https://kit.fontawesome.com/6b08127ac9.js" crossorigin="anonymous"></script>  
+  <style>
+  body
+  {
+      background-image: url('BG.png');
+      background-size: cover;
+  }
+
+  @keyframes animatetop
+  {
+      from
+      {
+          opacity: 0;
+      }
+      to
+      {
+          opacity: 1;
+      }
+  }
+  #loader2
+  {
+      width: 40px;
+      height: 40px;
+      margin: -75px 0 0 -75px;
+      border: 10px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 10px solid #00cc99;
+      animation: spin 2s linear;
+      text-align: center;
+  }
+
+  @keyframes spin
+  {
+      0%
+      {
+          transform: rotate(0deg);
+      }
+      100%
+      {
+          transform: rotate(360deg);
+      }
+  }
+
+  #page
+  {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      flex-wrap: wrap;
+  }
+
+  .search
+  {
+      display: inline-block;
+      background-color: #f91717 ;
+      outline: none;
+      border-radius: 20px;
+      color: #99ffff;
+      animation-name: dance;
+      animation-duration: 2s;
+  }
+  .city
+  {
+      padding: 5px;
+      color: #000000;
+      outline: none;
+      border-radius: 20px;
+      animation-name: dance;
+      animation-duration: 2s;
+  }
+
+  #tit
+  {
+      font-family: Arial, Helvetica, sans-serif;
+      animation-name: dance;
+      animation-duration: 2s;
+      color: #fff;
+  }
+  @keyframes dance
+  {
+      15%
+      {
+          -webkit-transform: translateX(5px);
+                  transform: translateX(5px);
+      }
+      30%
+      {
+          -webkit-transform: translateX(-5px);
+                  transform: translateX(-5px);
+      }
+      50%
+      {
+          -webkit-transform: translateX(3px);
+                  transform: translateX(3px);
+      }
+      65%
+      {
+          -webkit-transform: translateX(-3px);
+                  transform: translateX(-3px);
+      }
+      80%
+      {
+          -webkit-transform: translateX(2px);
+                  transform: translateX(2px);
+      }
+      100%
+      {
+          -webkit-transform: translateX(0);
+                  transform: translateX(0);
+      }
+  }
+
+  #fetch
+  {
+      display: none;
+      position: absolute;
+      justify-content: center;
+      align-items: center;
+      width: 90%;
+      height: 90%;
+      top: 10%;
+  }
+
+  #forecast
+  {
+      background: rgba(150, 46, 46, 0.04);
+      backdrop-filter: blur( 10px );
+      -webkit-backdrop-filter: blur( 10px );
+      border-radius: 10px;
+      color: #fff;
+      display: none;
+      padding: 10px;
+      font-family: monospace;
+      border: 2px solid rgba(255,255,255,0.06);
+  }
+  #forecast:hover
+  {
+      background: rgba(255, 0, 0, 0.1);
+  }
+  @media screen and (min-width: 601px)
+{
+   #forecast{
+       font-size: 20px;
+   }
+
+}
+  </style>
+</head>
+
+<body>
+    <div id ="page">
+     <div id ="tit"><h2>WEATHER FORECAST</h2></div>
+     <br>
+    <div style="display: flex;flex-direction: row;justify-content: center">
+    <input id="city"  class ="city"  placeholder="city">&emsp;
+    <input class="search" id="search" type="button" value="search" onclick = "load2(),fun(city.value)"><br>
+    </div>
+     <div id ="fetch">
+    <div id="loader2"></div>
+     </div>
+     <br>
+     <br>
+    <div id="forecast">
+      <b>
+      <p><div id="temp" style="text-align: center"></div></p>
+      <div><span   id="tempmin"style="float:left;margin-left: 10px"></span>
+      <span id="tempmax" style="float:right;margin-right: 10px">
+      </span></div>
+      <br>
+      <div  id="desimg"  style="text-align: center"></div>
+      <div id="des" style="text-align: center"></div><br>
+      <div><span   id="pres" style="float:left;margin-left: 10px"></span>
+     <span id="humid" style="float:right;margin-right: 10px">
+     </span></div>
+      <br>
+      <p><div id="wind" style="text-align: center"></div></p></b>
+      <div style="float: right;" onclick="share()">
+        <i class="fa fa-share-alt" style="font-size: 1.25rem;cursor: pointer;" aria-hidden="true"></i>
+      </div>
+      <div id="cright"  style="text-align: center;"><h3>&copy; Devoloped by Vignesh</h3></div>
+    </div>
+ </div>
+
+
+</body>
+
+
+ <script>
+  var searchurl = new URLSearchParams(location.search);
+    if (input = searchurl.get("city")) {
+        load2();
+        fun(input);
+        document.getElementById('city').value=input;
+    }    
+ function load2()
+ {
+   document.getElementById("forecast").style.display = "none";
+   document.getElementById("fetch").style.display = "flex";
+   setTimeout(function() {document.getElementById("fetch").style.display = "none";}, 2000);
+   setTimeout(function() {document.getElementById("forecast").style.display = "block";}, 2100);
+
+ }
+
+ function fun(cityID) {
+   //api url and key
+   var key = "1f69bee5f6470cb83ac3c57b11eecd35";
+   var URL = "https://api.openweathermap.org/data/2.5/weather?q=" + cityID +"&units=metric&appid=" + key;
+
+   // api request
+   var xhr = new XMLHttpRequest();
+   xhr.open('GET', URL, false);
+   xhr.send();
+   var res = JSON.parse(xhr.response);
+    //console.log(res);
+   //data from api
+   var temp = res.main.temp + "&deg;C";
+   var tempmin = res.main.temp_min + "&deg;C";
+   var tempmax = res.main.temp_max + "&deg;C";
+   var pre = res.main.pressure + "mb";
+   var des = res.weather[0].description;
+   var humid = res.main.humidity+"%";
+   var wind = res.wind.speed+ "km/h";
+   var img = "https://openweathermap.org/img/w/"+res.weather[0].icon+".png";
+   var x = document.createElement("IMG");
+   x.setAttribute("src", img);
+   x.setAttribute("width", 80);
+   document.getElementById("desimg").innerHTML = "";
+   document.getElementById("temp").innerHTML = "Temperature: "+temp;
+   document.getElementById("tempmin").innerHTML = "Min: "+tempmin;
+   document.getElementById("tempmax").innerHTML = "Max:"+tempmax;
+   document.getElementById("pres").innerHTML = "Pressure: "+pre;
+   document.getElementById("des").innerHTML = des;
+   document.getElementById("desimg").appendChild(x);
+   document.getElementById("humid").innerHTML = "&emsp;Humidity:"+humid;
+   document.getElementById("wind").innerHTML = "Wind : "+wind+ " at " +res.wind.deg+"&deg;";
+     
+}
+function share(){
+      if (navigator.share) {
+      navigator.share({
+      title: 'WeatherMan',
+      text: 'Know your area\'s weather',
+      url: 'https://botUser-2023.github.io/weatherapp/?city='+city.value,
+     })
+      .then(() => console.log('Successful share'))
+      .catch((error) => console.log('Error sharing', error));
+        }
+     }
+
+
+ </script>
+
+
+
+</html>
+
+
+
