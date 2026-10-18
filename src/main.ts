@@ -1,4 +1,5 @@
 import "./style.css";
+import { initClocks } from "./clocks";
 import { describe, getForecast, mood, reverseName, searchPlaces, type Forecast, type Place, type Units } from "./api";
 
 const MAX_SAVED = 5;
@@ -221,6 +222,7 @@ function toast(msg: string) {
 
 // ---------- boot ----------
 applyTheme();
+initClocks();
 renderWish();
 const qs = new URLSearchParams(location.search);
 const lat = parseFloat(qs.get("lat") ?? ""), lon = parseFloat(qs.get("lon") ?? "");

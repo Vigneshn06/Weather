@@ -69,3 +69,15 @@ footer { text-align:center; color:var(--muted); font-size:.8rem; padding:16px 0;
 .chart svg { display:block; }
 .chart .tl, .chart .dl { fill:var(--muted); font-size:11px; } .chart .dl { font-weight:600; }
 .chart .vl { fill:var(--fg); font-size:11px; font-weight:500; }
+
+.clocks { margin-bottom:12px; }
+.ch { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; } .ch h3 { margin:0; }
+#addclock { background:var(--card); color:var(--fg); border:1px solid var(--line); border-radius:999px; padding:6px 10px; font:inherit; font-size:.85rem; max-width:55%; }
+#addclock option { color:#0f172a; }
+.cgrid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; }
+.clock { position:relative; display:flex; flex-direction:column; gap:2px; padding:12px; border-radius:16px; border:1px solid var(--line); background:rgba(255,255,255,.08); }
+.clock.night { background:rgba(15,23,42,.45); color:#f8fafc; }
+.clock .cf { font-size:1.4rem; } .clock b { font-size:.9rem; }
+.ct { font-family:Outfit,Inter,sans-serif; font-size:1.6rem; font-weight:300; font-variant-numeric:tabular-nums; }
+.cd { color:var(--muted); } .clock.night .cd { color:#cbd5e1; }
+.cx { position:absolute; top:6px; right:8px; background:none; border:0; color:var(--muted); cursor:pointer; font-size:1rem; }
