@@ -88,3 +88,7 @@ footer { text-align:center; color:var(--muted); font-size:.8rem; padding:16px 0;
 .cx { position:absolute; top:6px; right:8px; background:none; border:0; color:inherit; opacity:.7; cursor:pointer; font-size:1rem; } .cx:hover { opacity:1; }
 .cbar { position:relative; height:5px; margin-top:6px; border-radius:3px; background:linear-gradient(90deg,#1e1b4b 0%,#1e1b4b 20%,#fb923c 27%,#38bdf8 40%,#38bdf8 68%,#f97316 76%,#1e1b4b 83%,#1e1b4b 100%); }
 .cbar i { position:absolute; top:-3px; width:3px; height:11px; border-radius:2px; background:#fff; box-shadow:0 0 4px rgba(0,0,0,.6); transform:translateX(-50%); }
+
+.seg { display:inline-flex; margin-top:12px; background:var(--card); border:1px solid var(--line); border-radius:999px; padding:3px; }
+.seg button { background:none; border:0; color:var(--muted); padding:6px 14px; border-radius:999px; cursor:pointer; font:inherit; font-size:.85rem; }
+.seg button.on { background:var(--a); color:#00131f; font-weight:600; }

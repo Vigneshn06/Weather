@@ -38,13 +38,13 @@
         <button id="showall" class="chip">All countries</button></div></div>
       <div id="clocks" class="cgrid"></div>
       <div id="allwrap" hidden>
-        <input id="csearch" type="search" placeholder="Search country…" aria-label="Search country" />
+        <div class="seg" id="cmode"><button data-m="country" class="on">Country</button><button data-m="city">City / region</button></div>
+        <input id="csearch" type="search" placeholder="Search country…" aria-label="Search" />
         <div id="allclocks" class="cgrid scroll"></div>
       </div>
     </section>
 
     <main id="main"><p class="hint">Search a city or tap 📍 to begin.</p></main>
-    <footer>Data by <a href="https://open-meteo.com/">Open-Meteo</a> · Developed by Vignesh</footer>
   </div>
 </body>
 </html>
