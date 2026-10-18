@@ -156,7 +156,7 @@ function render(p: Place, f: Forecast) {
   if (start < 0) start = 0;
   const hours = f.hourly.time.slice(start, start + 24).map((x, k) => {
     const i = start + k, [, ic] = describe(f.hourly.weather_code[i]);
-    return `<div class="hr"><span>${k === 0 ? "Now" : fmtHour(x)}</span><span class="ic">${ic}</span><b>${t(f.hourly.temperature_2m[i])}</b><small>💧${f.hourly.precipitation_probability[i] ?? 0}%</small></div>`;
+    return `<div class="hr"><span>${k === 0 ? "Now" : fmtHour(x)}</span><span class="ic" title="${describe(f.hourly.weather_code[i])[0]}">${ic}</span><b>${t(f.hourly.temperature_2m[i])}</b><small>💧${f.hourly.precipitation_probability[i] ?? 0}%</small></div>`;
   }).join("");
   const rainNow = f.hourly.precipitation_probability[start] ?? 0;
   const when = new Date(c.time).toLocaleString([], { weekday: "long", hour: "numeric", minute: "2-digit" });
@@ -165,7 +165,7 @@ function render(p: Place, f: Forecast) {
   const days = f.daily.time.map((d, i) => {
     const l = f.daily.temperature_2m_min[i], h = f.daily.temperature_2m_max[i];
     const left = ((l - lo) / (hi - lo || 1)) * 100, width = ((h - l) / (hi - lo || 1)) * 100;
-    return `<div class="day"><span class="dn">${day(d, i)}</span><span class="ic">${describe(f.daily.weather_code[i])[1]}</span>
+    return `<div class="day"><span class="dn">${day(d, i)}</span><span class="ic" title="${describe(f.daily.weather_code[i])[0]}">${describe(f.daily.weather_code[i])[1]}</span>
       <small>💧${f.daily.precipitation_probability_max[i] ?? 0}%</small><span class="lo">${t(l)}</span>
       <div class="bar"><i style="left:${left}%;width:${Math.max(width, 6)}%"></i></div><span class="hi">${t(h)}</span></div>`;
   }).join("");
