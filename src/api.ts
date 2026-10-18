@@ -27,9 +27,16 @@ export async function getForecast(p: Place, units: Units): Promise<Forecast> {
     temperature_unit: imp ? "fahrenheit" : "celsius",
     wind_speed_unit: imp ? "mph" : "kmh",
   });
-  const r = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
-  if (!r.ok) throw new Error("Could not load forecast");
-  return r.json();
+  const url = `https://api.open-meteo.com/v1/forecast?${params}`;
+  let lastErr: unknown;
+  for (let attempt = 0; attempt < 2; attempt++) { // one automatic retry for transient errors
+    try {
+      const r = await fetch(url, { signal: AbortSignal.timeout(15000) });
+      if (!r.ok) throw new Error(`Weather service returned HTTP ${r.status}`);
+      return await r.json();
+    } catch (e) { lastErr = e; await new Promise(res => setTimeout(res, 800)); }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error("Could not load forecast");
 }
 
 export async function reverseName(lat: number, lon: number): Promise<string> {

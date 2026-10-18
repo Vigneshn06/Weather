@@ -203,7 +203,12 @@ async function show(p: Place) {
   current = p; save("current", p); renderWish();
   $("main").innerHTML = `<div class="skeleton"></div><div class="skeleton s2"></div>`;
   try { render(p, await getForecast(p, units)); }
-  catch { $("main").innerHTML = `<p class="hint">⚠️ Couldn't load the forecast. <button class="chip" id="retry">Retry</button></p>`; $("retry").onclick = () => show(p); }
+  catch (e) {
+    console.error("Forecast failed:", e);
+    const why = e instanceof Error ? e.message : "Unknown error";
+    $("main").innerHTML = `<p class="hint">⚠️ Couldn't load the forecast for ${esc(p.name)}.<br><small>${esc(why)}</small><br><button class="chip" id="retry">Retry</button></p>`;
+    $("retry").onclick = () => show(p);
+  }
   const u = new URL(location.href);
   u.search = `?lat=${p.latitude.toFixed(3)}&lon=${p.longitude.toFixed(3)}&name=${encodeURIComponent(p.name)}`;
   history.replaceState(null, "", u);
