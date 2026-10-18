@@ -80,10 +80,11 @@ export function initClocks() {
       const tz = el.dataset.tz!;
       const time = new Intl.DateTimeFormat([], { timeZone: tz, hour: "numeric", minute: "2-digit", second: "2-digit", hour12: !h24, hourCycle: h24 ? "h23" : undefined }).format(now);
       const date = new Intl.DateTimeFormat([], { timeZone: tz, weekday: "short", day: "numeric", month: "short" }).format(now);
+      const off = new Intl.DateTimeFormat("en", { timeZone: tz, timeZoneName: "shortOffset" }).formatToParts(now).find(x => x.type === "timeZoneName")?.value ?? "";
       const ph = phaseOf(+el.dataset.lat!, +el.dataset.lon!, now);
       el.className = `clock ${ph}`;
       el.querySelector(".ct")!.textContent = time;
-      el.querySelector(".cd")!.textContent = `${PHASE_INFO[ph][0]} ${PHASE_INFO[ph][1]} · ${date}`;
+      el.querySelector(".cd")!.textContent = `${PHASE_INFO[ph][0]} ${PHASE_INFO[ph][1]} · ${date} · ${off}`;
       (el.querySelector(".cbar i") as HTMLElement).style.left = `${(mins(tz) / 1440) * 100}%`;
     });
   };
