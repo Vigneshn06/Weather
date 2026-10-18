@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WeatherWorld · Weather &amp; World Clock</title>
+  <meta name="description" content="Fast, modern weather forecast with hourly and 7-day outlook, saved locations and shareable links." />
+  <meta name="theme-color" content="#0f172a" />
+  <meta property="og:title" content="WeatherWorld" />
+  <meta property="og:description" content="Know your area's weather and share it with your pals." />
+  <link rel="icon" type="image/png" href="/Weather/weather.png" />
+  <link rel="manifest" href="/Weather/manifest.webmanifest" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@200;300;500&display=swap" rel="stylesheet" />
+  <script type="module" src="/src/main.ts"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <div class="brand"><h1>🌍 WeatherWorld</h1><small>Weather &amp; world clock</small></div>
+      <div class="actions">
+        <button id="unit" class="chip" title="Toggle °C / °F">°C</button>
+        <button id="theme" class="chip" title="Toggle theme" aria-label="Toggle theme">🌓</button>
+      </div>
+    </header>
+
+    <div class="searchbox">
+      <input id="q" type="search" placeholder="Search city…" autocomplete="off" aria-label="Search city" />
+      <button id="locate" class="chip" title="Use my location" aria-label="Use my location">📍</button>
+      <ul id="suggest" class="suggest" hidden></ul>
+    </div>
+
+    <nav id="wish" class="wish" aria-label="Saved locations"></nav>
+
+    <section class="card clocks" aria-label="World clocks">
+      <div class="ch"><h3>World clock</h3>
+        <div class="cctl"><button id="fmt" class="chip" title="12-hour / 24-hour">12h</button>
+        <button id="showall" class="chip">All countries</button></div></div>
+      <div id="clocks" class="cgrid"></div>
+      <div id="allwrap" hidden>
+        <input id="csearch" type="search" placeholder="Search country…" aria-label="Search country" />
+        <div id="allclocks" class="cgrid scroll"></div>
+      </div>
+    </section>
+
+    <main id="main"><p class="hint">Search a city or tap 📍 to begin.</p></main>
+    <footer>Data by <a href="https://open-meteo.com/">Open-Meteo</a> · Developed by Vignesh</footer>
+  </div>
+</body>
+</html>
