@@ -26,8 +26,8 @@ export function phaseOf(lat: number, lon: number, d: Date): Phase {
   return "night";
 }
 
-const KEY = "clocks2", FMT = "clock24";
-const DEFAULTS = ["IN", "CA", "US"];
+const KEY = "clocks3", FMT = "clock24";
+const DEFAULTS = ["IN", "CA", "CA-AB", "US"];
 const esc = (s: string) => s.replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
 
 export function initClocks() {
@@ -92,10 +92,10 @@ export function initClocks() {
   fmtBtn.onclick = () => { h24 = !h24; setFmt(); };
   allBtn.onclick = () => {
     allWrap.hidden = !allWrap.hidden;
-    allBtn.textContent = allWrap.hidden ? `All ${COUNTRIES.length} countries ▾` : "Hide countries ▴";
+    allBtn.textContent = allWrap.hidden ? `All ${COUNTRIES.length} clocks ▾` : "Hide countries ▴";
     if (!allWrap.hidden) renderAll();
   };
-  allBtn.textContent = `All ${COUNTRIES.length} countries ▾`;
+  allBtn.textContent = `All ${COUNTRIES.length} clocks ▾`;
   search.oninput = renderAll;
   fmtBtn.textContent = h24 ? "24h" : "12h";
   renderPinned();
