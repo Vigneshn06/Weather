@@ -26,8 +26,8 @@ export function phaseOf(lat: number, lon: number, d: Date): Phase {
   return "night";
 }
 
-const KEY = "clocks2", FMT = "clock24";
-const DEFAULTS = ["IN", "CA", "US"];
+const KEY = "clocks3", FMT = "clock24";
+const DEFAULTS = ["IN", "CA", "CA-AB", "US"];
 const esc = (s: string) => s.replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
 
 export function initClocks() {
@@ -40,11 +40,18 @@ export function initClocks() {
 
   let ids: string[] = [];
   try { ids = JSON.parse(localStorage.getItem(KEY) ?? "null") ?? DEFAULTS; } catch { ids = DEFAULTS; }
-  ids = ids.filter(i => COUNTRIES.some(c => c.code === i));
+  ids = ids.filter(i => COUNTRIES.some(c => c.code === i) || i in custom);
   if (!ids.length) ids = [...DEFAULTS];
+  let custom: Record<string, Country> = {};
+  try { custom = JSON.parse(localStorage.getItem("customclocks") ?? "{}"); } catch { custom = {}; }
+  let mode: "country" | "city" = "country";
+  let cityResults: Country[] = [];
   let h24 = localStorage.getItem(FMT) === "1";
-  const persist = () => localStorage.setItem(KEY, JSON.stringify(ids));
-  const byCode = (c: string) => COUNTRIES.find(x => x.code === c)!;
+  const persist = () => {
+    localStorage.setItem(KEY, JSON.stringify(ids));
+    localStorage.setItem("customclocks", JSON.stringify(Object.fromEntries(ids.filter(i => i in custom).map(i => [i, custom[i]]))));
+  };
+  const byCode = (c: string) => COUNTRIES.find(x => x.code === c) ?? custom[c];
 
   const card = (c: Country, pinned: boolean) => `
     <div class="clock" data-code="${c.code}" data-tz="${c.tz}" data-lat="${c.lat}" data-lon="${c.lon}">
@@ -56,6 +63,8 @@ export function initClocks() {
 
   const bind = (root: HTMLElement) => root.querySelectorAll<HTMLButtonElement>("[data-pin]").forEach(b => b.onclick = () => {
     const code = b.dataset.pin!;
+    const found = cityResults.find(c => c.code === code);
+    if (found) custom[code] = found;
     ids = ids.includes(code) ? ids.filter(i => i !== code) : [...ids, code];
     persist(); renderPinned(); if (!allWrap.hidden) renderAll();
   });
@@ -63,12 +72,38 @@ export function initClocks() {
     pinnedEl.innerHTML = ids.map(i => card(byCode(i), true)).join("") || `<p class="hint">No pinned clocks. Open "All countries" and tap ☆.</p>`;
     bind(pinnedEl); tick();
   };
+  let timer = 0;
   const renderAll = () => {
     const q = search.value.trim().toLowerCase();
-    const list = COUNTRIES.filter(c => c.name.toLowerCase().includes(q) || c.code.toLowerCase() === q);
-    allEl.innerHTML = list.map(c => card(c, false)).join("") || `<p class="hint">No country found.</p>`;
+    if (mode === "city") {
+      allEl.innerHTML = cityResults.map(c => card(c, false)).join("") || `<p class="hint">${q.length < 2 ? "Type a city or region, e.g. Mumbai, Chennai, Edmonton." : "No place found."}</p>`;
+    } else {
+      const list = COUNTRIES.filter(c => c.name.toLowerCase().includes(q) || c.code.toLowerCase() === q);
+      allEl.innerHTML = list.map(c => card(c, false)).join("") || `<p class="hint">No country found.</p>`;
+    }
     bind(allEl); tick();
   };
+  const searchCities = async () => {
+    const q = search.value.trim();
+    if (q.length < 2) { cityResults = []; renderAll(); return; }
+    try {
+      const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=12&language=en`);
+      const j = await r.json();
+      cityResults = ((j.results ?? []) as any[]).filter(x => x.timezone).map(x => ({
+        code: `c:${x.latitude.toFixed(2)},${x.longitude.toFixed(2)}`,
+        name: [x.name, x.admin1, x.country].filter(Boolean).join(", "),
+        flag: x.country_code ? String.fromCodePoint(...[...String(x.country_code).toUpperCase()].map((ch: string) => 0x1f1e6 + ch.charCodeAt(0) - 65)) : "🌐",
+        tz: x.timezone, lat: x.latitude, lon: x.longitude,
+      }));
+    } catch { cityResults = []; }
+    renderAll();
+  };
+  document.querySelectorAll<HTMLButtonElement>("#cmode button").forEach(b => b.onclick = () => {
+    mode = b.dataset.m as "country" | "city";
+    document.querySelectorAll("#cmode button").forEach(x => x.classList.toggle("on", x === b));
+    search.placeholder = mode === "city" ? "Search city / region (Mumbai, Chennai…)" : "Search country…";
+    search.value = ""; cityResults = []; renderAll();
+  });
 
   const tick = () => {
     const now = new Date();
@@ -79,11 +114,12 @@ export function initClocks() {
     document.querySelectorAll<HTMLElement>(".clock").forEach(el => {
       const tz = el.dataset.tz!;
       const time = new Intl.DateTimeFormat([], { timeZone: tz, hour: "numeric", minute: "2-digit", second: "2-digit", hour12: !h24, hourCycle: h24 ? "h23" : undefined }).format(now);
-      const date = new Intl.DateTimeFormat([], { timeZone: tz, weekday: "short", day: "numeric", month: "short" }).format(now);
+      const date = new Intl.DateTimeFormat([], { timeZone: tz, weekday: "short", day: "numeric", month: "short", year: "numeric" }).format(now);
+      const off = new Intl.DateTimeFormat("en", { timeZone: tz, timeZoneName: "shortOffset" }).formatToParts(now).find(x => x.type === "timeZoneName")?.value ?? "";
       const ph = phaseOf(+el.dataset.lat!, +el.dataset.lon!, now);
       el.className = `clock ${ph}`;
       el.querySelector(".ct")!.textContent = time;
-      el.querySelector(".cd")!.textContent = `${PHASE_INFO[ph][0]} ${PHASE_INFO[ph][1]} · ${date}`;
+      el.querySelector(".cd")!.textContent = `${PHASE_INFO[ph][0]} ${PHASE_INFO[ph][1]} · ${date} · ${off}`;
       (el.querySelector(".cbar i") as HTMLElement).style.left = `${(mins(tz) / 1440) * 100}%`;
     });
   };
@@ -92,11 +128,11 @@ export function initClocks() {
   fmtBtn.onclick = () => { h24 = !h24; setFmt(); };
   allBtn.onclick = () => {
     allWrap.hidden = !allWrap.hidden;
-    allBtn.textContent = allWrap.hidden ? `All ${COUNTRIES.length} countries ▾` : "Hide countries ▴";
+    allBtn.textContent = allWrap.hidden ? "Search & add clocks ▾" : "Hide search ▴";
     if (!allWrap.hidden) renderAll();
   };
-  allBtn.textContent = `All ${COUNTRIES.length} countries ▾`;
-  search.oninput = renderAll;
+  allBtn.textContent = "Search & add clocks ▾";
+  search.oninput = () => { if (mode === "city") { clearTimeout(timer); timer = window.setTimeout(searchCities, 300); } else renderAll(); };
   fmtBtn.textContent = h24 ? "24h" : "12h";
   renderPinned();
   setInterval(tick, 1000);

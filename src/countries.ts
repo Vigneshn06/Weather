@@ -30,7 +30,7 @@ BI|Burundi|Africa/Bujumbura|-3.4|29.9
 CV|Cabo Verde|Atlantic/Cape_Verde|14.9|-23.5
 KH|Cambodia|Asia/Phnom_Penh|11.6|104.9
 CM|Cameroon|Africa/Douala|3.9|11.5
-CA|Canada|America/Toronto|45.4|-75.7
+CA|Canada – Ottawa|America/Toronto|45.4|-75.7
 CF|Central African Republic|Africa/Bangui|4.4|18.6
 TD|Chad|Africa/Ndjamena|12.1|15.0
 CL|Chile|America/Santiago|-33.4|-70.7
@@ -186,7 +186,7 @@ UG|Uganda|Africa/Kampala|0.3|32.6
 UA|Ukraine|Europe/Kyiv|50.5|30.5
 AE|UAE|Asia/Dubai|24.5|54.4
 GB|United Kingdom|Europe/London|51.5|-0.1
-US|United States|America/New_York|38.9|-77.0
+US|USA – Washington DC|America/New_York|38.9|-77.0
 UY|Uruguay|America/Montevideo|-34.9|-56.2
 UZ|Uzbekistan|Asia/Tashkent|41.3|69.2
 VU|Vanuatu|Pacific/Efate|-17.7|168.3
@@ -195,11 +195,23 @@ VE|Venezuela|America/Caracas|10.5|-66.9
 VN|Vietnam|Asia/Ho_Chi_Minh|21.0|105.8
 YE|Yemen|Asia/Aden|15.4|44.2
 ZM|Zambia|Africa/Lusaka|-15.4|28.3
-ZW|Zimbabwe|Africa/Harare|-17.8|31.0`;
+ZW|Zimbabwe|Africa/Harare|-17.8|31.0
+CA-BC|Canada – Vancouver|America/Vancouver|49.3|-123.1
+CA-AB|Canada – Edmonton|America/Edmonton|53.5|-113.5
+CA-AC|Canada – Calgary|America/Edmonton|51.0|-114.1
+CA-MB|Canada – Winnipeg|America/Winnipeg|49.9|-97.1
+CA-ON|Canada – Toronto|America/Toronto|43.7|-79.4
+CA-NS|Canada – Halifax|America/Halifax|44.6|-63.6
+CA-NL|Canada – St. John's|America/St_Johns|47.6|-52.7
+US-CA|USA – Los Angeles|America/Los_Angeles|34.1|-118.2
+US-IL|USA – Chicago|America/Chicago|41.9|-87.6
+US-CO|USA – Denver|America/Denver|39.7|-105.0
+US-AK|USA – Anchorage|America/Anchorage|61.2|-149.9
+US-HI|USA – Honolulu|Pacific/Honolulu|21.3|-157.9`;
 
 export interface Country { code: string; name: string; flag: string; tz: string; lat: number; lon: number; }
 
-const flag = (cc: string) => String.fromCodePoint(...[...cc].map(c => 0x1f1e6 + c.charCodeAt(0) - 65));
+const flag = (cc: string) => String.fromCodePoint(...[...cc.slice(0, 2)].map(c => 0x1f1e6 + c.charCodeAt(0) - 65));
 const validTz = (tz: string) => { try { new Intl.DateTimeFormat("en", { timeZone: tz }); return true; } catch { return false; } };
 
 export const COUNTRIES: Country[] = RAW.split("\n").map(l => {
