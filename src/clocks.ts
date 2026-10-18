@@ -38,12 +38,12 @@ export function initClocks() {
   const fmtBtn = document.getElementById("fmt")!;
   const allBtn = document.getElementById("showall")!;
 
+  let custom: Record<string, Country> = {};
+  try { custom = JSON.parse(localStorage.getItem("customclocks") ?? "{}"); } catch { custom = {}; }
   let ids: string[] = [];
   try { ids = JSON.parse(localStorage.getItem(KEY) ?? "null") ?? DEFAULTS; } catch { ids = DEFAULTS; }
   ids = ids.filter(i => COUNTRIES.some(c => c.code === i) || i in custom);
   if (!ids.length) ids = [...DEFAULTS];
-  let custom: Record<string, Country> = {};
-  try { custom = JSON.parse(localStorage.getItem("customclocks") ?? "{}"); } catch { custom = {}; }
   let mode: "country" | "city" = "country";
   let cityResults: Country[] = [];
   let h24 = localStorage.getItem(FMT) === "1";
